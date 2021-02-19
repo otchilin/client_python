@@ -30,13 +30,21 @@ class TestCounter(unittest.TestCase):
         self.assertEqual(1, self.registry.get_sample_value('c_total'))
         self.counter.inc(7)
         self.assertEqual(8, self.registry.get_sample_value('c_total'))
-    
+
     def test_repr(self):
         self.assertEqual(repr(self.counter), "prometheus_client.metrics.Counter(c)")
 
     def test_negative_increment_raises(self):
         self.assertRaises(ValueError, self.counter.inc, -1)
-    
+
+    def test_reset(self):
+        self.assertEqual(0, self.registry.get_sample_value('c_total'))
+        self.counter.inc()
+        self.counter.reset()
+        self.assertEqual(0, self.registry.get_sample_value('c_total'))
+        self.counter.inc()
+        self.registry.reset_metrics()
+        self.assertEqual(0, self.registry.get_sample_value('c_total'))
 
     def test_function_decorator(self):
         @self.counter.count_exceptions(ValueError)
@@ -87,7 +95,7 @@ class TestGauge(unittest.TestCase):
     def setUp(self):
         self.registry = CollectorRegistry()
         self.gauge = Gauge('g', 'help', registry=self.registry)
-    
+
     def test_repr(self):
         self.assertEqual(repr(self.gauge), "prometheus_client.metrics.Gauge(g)")
 

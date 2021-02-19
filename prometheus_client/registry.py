@@ -149,5 +149,17 @@ class CollectorRegistry(object):
                     return s.value
         return None
 
+    def reset_metrics(self):
+        """Reset all the counter type metrics from all collectors in registry"""
+
+        for metric in self.collect():
+            if metric.type == 'counter':
+                if hasattr(self._names_to_collectors[metric.name], '_metrics'):
+                    for sub_metric in self._names_to_collectors[metric.name]._metrics:
+                        self._names_to_collectors[metric.name]._metrics[sub_metric].reset()
+                else:
+                    if hasattr(self._names_to_collectors[metric.name], 'reset'):
+                        self._names_to_collectors[metric.name].reset()
+
 
 REGISTRY = CollectorRegistry(auto_describe=True)

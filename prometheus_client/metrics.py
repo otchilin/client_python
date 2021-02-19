@@ -257,6 +257,11 @@ class Counter(MetricWrapperBase):
             raise ValueError('Counters can only be incremented by non-negative amounts.')
         self._value.inc(amount)
 
+    def reset(self):
+        """Reset counter to zero."""
+        if hasattr(self, '_value'):
+            self._value.set(0)
+
     def count_exceptions(self, exception=Exception):
         """Count exceptions in a block of code or function.
 
